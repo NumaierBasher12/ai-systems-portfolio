@@ -1,0 +1,6 @@
+{
+  "max_label_words": 8,
+  "max_title_chars": 80,
+  "blocked_words": ["suicide", "kill yourself", "rape", "nazi", "porn", "onlyfans", "racist", "sexual", "slur",
+    "wallhack", "wall hack", "wall-hack", "wall-hacks", "wallhacks", "cheat", "cheats", "cheater", "cheating", "hacker", "hacking", "aimbot", "smurf", "boosted", "scam", "stolen"]
+}

@@ -1,0 +1,21 @@
+{
+  "channels": [
+    {"name": "jynxzi", "channel_id": "UCjiXtODGCCulmhwypZAWSag"},
+    {"name": "caedrel", "channel_id": "UCOFiUtKui6-x4T-J7_DgCag"},
+    {"name": "zackrawrr", "channel_id": "UCq2jigrIGtupbTXiNjq6Wrw"}
+  ],
+  "subreddits": ["Jynxzi", "Rainbow6", "R6ProLeague", "LivestreamFail"],
+  "core_subreddits": ["Jynxzi", "Rainbow6", "R6ProLeague"],
+  "searches": ["jynxzi", "jynxzi rainbow six siege"],
+  "keywords": ["jynxzi", "rainbow six", "r6", "siege", "ranked", "clutch", "ace", "clip"],
+  "reddit_gap_s": 15,
+  "rss_gap_s": 3,
+  "search_results": 15,
+  "channel_listing": 12,
+  "vod_min_seconds": 3600,
+  "brand_voice_note": "C:/OBSIDIAN VAULT/Codebase and learning/Projects/Assistant/Brand Voice.md",
+  "playbook_note": "C:/CLIPPING VAULT/Jynxzi/Jynxzi Playbook.md",
+  "review_dir": "C:/OBSIDIAN VAULT/Codebase and learning/Projects/Assistant/reviews",
+  "facecam": {"jynxzi": {"x": 0, "y": 390, "w": 430, "h": 330}},
+  "digest_dir": "C:/OBSIDIAN VAULT/Codebase and learning/Projects/Assistant/digests"
+}

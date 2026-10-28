@@ -1,0 +1,33 @@
+# secrets: never commit
+.env
+.env.*
+*token*
+.telegram-token
+cookies*.txt
+*-cookies.txt
+owner.json
+pair-code.txt
+secrets/
+*.pem
+# model weights and media: too big, downloaded on first use
+models/
+*.safetensors
+*.gguf
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.mp4
+*.mkv
+*.webm
+*.wav
+*.mp3
+*.m4a
+work/
+video/
+# python
+__pycache__/
+*.pyc
+.venv/
+*.db
+*.log

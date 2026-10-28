@@ -1,0 +1,7 @@
+{
+  "claude_calls_per_night": 20,
+  "min_free_ram_gb": 2.0,
+  "min_free_vram_gb": 3.5,
+  "min_free_disk_gb": 50,
+  "notify_telegram": true
+}
