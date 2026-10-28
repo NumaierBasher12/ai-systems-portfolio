@@ -34,13 +34,12 @@ Models you will download (once):
 
 ```powershell
 winget install --id Git.Git -e --source winget
-cd C:\
-mkdir dev; cd dev
+cd <a folder for your code>
 git clone https://github.com/yushaaanan-design/ai-systems-portfolio.git ai-systems-portfolio
 cd ai-systems-portfolio
 ```
 
-No Git? Click **Code → Download ZIP** on GitHub and unzip it to `C:\dev\ai-systems-portfolio`.
+No Git? Click **Code → Download ZIP** on GitHub and unzip it to a folder of your choice (called `<repo folder>` below).
 
 > Keep code outside OneDrive and outside any Obsidian vault. Syncing services lock files mid-run and upload multi-GB videos.
 
@@ -94,7 +93,7 @@ nvidia-smi                # shows your GPU and free memory
 Two environments, because Demucs and SpeechBrain pin their own PyTorch build, which can clash with the main tools.
 
 ```powershell
-cd C:\dev\ai-systems-portfolio
+cd <repo folder>
 
 # main environment
 py -3.13 -m venv .venv
@@ -110,7 +109,7 @@ py -3.13 -m venv .venv-audio
 
 - No NVIDIA GPU? Use `--index-url https://download.pytorch.org/whl/cpu` for torch and skip the two `nvidia-*` lines in `requirements.txt`.
 - "running scripts is disabled on this system": run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, or always call `.\.venv\Scripts\python` directly as shown (no activation needed).
-- The film scripts call `py -3.13`. To use the venv instead, replace `py -3.13` with `C:\dev\ai-systems-portfolio\.venv\Scripts\python` in `run_film.ps1`, or install the requirements into the `py -3.13` Python as well.
+- The film scripts call `py -3.13`. To use the venv instead, replace `py -3.13` with `<repo folder>\.venv\Scripts\python` in `run_film.ps1`, or install the requirements into the `py -3.13` Python as well.
 
 **Check:**
 
@@ -164,7 +163,7 @@ ollama run qwen3:4b "Reply with the single word: ready"
 ## 5. Folder layout after setup
 
 ```
-C:\dev\ai-systems-portfolio\
+<repo folder>\
   .venv\  .venv-audio\
   video-pipeline\
     2-film-analysis\
@@ -187,16 +186,16 @@ The scripts are shown exactly as they ran, so a few constants still name the aut
 
 | File | Constant / line | Authors' value | Change to |
 |---|---|---|---|
-| `2-film-analysis/run_film.ps1` | `$root` | `C:\dev\documentary` | `C:\dev\ai-systems-portfolio\video-pipeline\2-film-analysis` |
-| `2-film-analysis/run_film.ps1` | `$vs` | another app's Python | `C:\dev\ai-systems-portfolio\.venv-audio\Scripts\python.exe` |
+| `2-film-analysis/run_film.ps1` | `$root` | the authors' project folder | `<repo folder>\video-pipeline\2-film-analysis` |
+| `2-film-analysis/run_film.ps1` | `$vs` | another app's Python | `<repo folder>\.venv-audio\Scripts\python.exe` |
 | `2-film-analysis/run_film.ps1` | `$ff` | winget FFmpeg folder | keep it if you installed FFmpeg with winget; otherwise the folder holding `ffmpeg.exe` |
 | `2-film-analysis/run_film.ps1` | `-c:v h264_nvenc -preset p4 -cq 20` | NVIDIA encoder | no NVIDIA GPU: `-c:v libx264 -preset veryfast -crf 20` |
 | `2-film-analysis/dl.py` | the FFmpeg `glob` | winget folder | same rule as `$ff` |
-| `1-intake/reel_bot.py` | `OUT`, `COOKIES`, `YTDLP`, `FFMPEG` | `C:\dev\reels\...`, a separate venv | your inbox folder, your cookie file, `.venv\Scripts\python.exe`, your FFmpeg `bin` folder |
-| `1-intake/loop.py`, `report.py`, `reellog.py`, `screentext.py`, `collect_links.py` | `ROOT`, `ANALYZE`, `OUT`, `FFMPEG`, `VAULT_DIGESTS` | `C:\dev\reels`, vault paths | your folders (see the note in 7.5) |
+| `1-intake/reel_bot.py` | `OUT`, `COOKIES`, `YTDLP`, `FFMPEG` | the authors' folders, a separate venv | your inbox folder, your cookie file, `.venv\Scripts\python.exe`, your FFmpeg `bin` folder |
+| `1-intake/loop.py`, `report.py`, `reellog.py`, `screentext.py`, `collect_links.py` | `ROOT`, `ANALYZE`, `OUT`, `FFMPEG`, `VAULT_DIGESTS` | the authors' folders and vault | your folders (see the note in 7.5) |
 | `3-shorts-clipper/config/sources.json` | `brand_voice_note`, `playbook_note`, `review_dir`, `digest_dir` | vault paths | notes in your own vault (missing notes are simply skipped) |
 | `3-shorts-clipper/config/sources.json` | `facecam` | one streamer's webcam box | the x/y/w/h of the webcam in your source video, or delete it for the blurred layout |
-| `3-shorts-clipper/chief/core.py` | `notify()` path `C:\dev\reels\bot` | the bot folder | your `1-intake` folder, or set `"notify_telegram": false` in `config/budget.json` |
+| `3-shorts-clipper/chief/core.py` | `notify()` bot path | the bot folder | your `1-intake` folder, or set `"notify_telegram": false` in `config/budget.json` |
 | `3-shorts-clipper/writer/writer.py` | `CLIPS_DB` | the authors' study database | leave it: a missing database is handled |
 
 ---
@@ -206,7 +205,7 @@ The scripts are shown exactly as they ran, so a few constants still name the aut
 ### 7.1 Analyse one YouTube video, frame by frame
 
 ```powershell
-cd C:\dev\ai-systems-portfolio\video-pipeline\2-film-analysis
+cd <repo folder>\video-pipeline\2-film-analysis
 .\run_film.ps1 -Id <youtube_id> -Stage cpu     # download, audio, proxy, cuts + motion, contact sheets
 .\run_film.ps1 -Id <youtube_id> -Stage gpu     # Whisper, Demucs, audio report, voices, Qwen frame tags
 py -3.13 .\film_card.py .\work\<youtube_id>     # the one-page summary
@@ -246,7 +245,7 @@ Instagram needs your logged-in session as a cookie file (section 8). Save it as 
 Open Claude Code in the work folder and paste a prompt like this:
 
 ```powershell
-cd C:\dev\ai-systems-portfolio\video-pipeline\2-film-analysis\work\<id>
+cd <repo folder>\video-pipeline\2-film-analysis\work\<id>
 claude
 ```
 
@@ -263,7 +262,7 @@ This is the step that keeps the cost at about 18,000 tokens for an 18-minute fil
 ### 7.4 Long video → short clips
 
 ```powershell
-cd C:\dev\ai-systems-portfolio\video-pipeline\3-shorts-clipper
+cd <repo folder>\video-pipeline\3-shorts-clipper
 ..\..\.venv\Scripts\python -X utf8 chief\run_all.py --selftest                  # checks the queue and lock
 ..\..\.venv\Scripts\python -X utf8 ingest\prepare_vod.py "<youtube link>"       # download + transcript + loudness, queues the jobs
 ..\..\.venv\Scripts\python -X utf8 chief\run_all.py                             # moments -> writer -> cutter
@@ -292,7 +291,7 @@ If Claude is not logged in or the nightly budget (`config\budget.json`) is spent
 **Step 4.** Test the link reader, then start the bot:
 
 ```powershell
-cd C:\dev\ai-systems-portfolio\video-pipeline\1-intake
+cd <repo folder>\video-pipeline\1-intake
 ..\..\.venv\Scripts\python reel_bot.py --selftest     # prints "selftest ok"
 ..\..\.venv\Scripts\python reel_bot.py
 ```
@@ -326,12 +325,12 @@ Pacing the code already enforces: one download at a time, 30 s between Instagram
 
 ### 9.1 Make the vault
 
-**Step 1.** Open Obsidian → **Create new vault** → name it, place it **outside** `C:\dev` (e.g. `C:\MY VAULT`).
+**Step 1.** Open Obsidian → **Create new vault** → name it, place it **outside** your code folder (e.g. `<your vault>`).
 
 **Step 2.** Create this structure and copy the templates from `context-harness\templates\`:
 
 ```
-MY VAULT\
+<your vault>\
   INDEX.md                       a list of projects, one line each
   Harness\Preferences.md         how you want the assistant to work
   Harness\Lessons.md             symptom | cause | fix
@@ -355,7 +354,7 @@ Test it: open a new Claude Code session and ask "what is the state of `my-projec
 ### 9.3 Share it across PCs and accounts
 
 ```powershell
-cd "C:\MY VAULT"
+cd "<your vault>"
 git init -b main
 Add-Content .gitignore ".obsidian/workspace*.json`n.trash/"
 git add -A; git commit -m "First vault commit"
@@ -368,7 +367,7 @@ Daily sync (pull, then commit and push only changed notes after a secret scan; s
 
 ```bash
 # Git Bash
-bash /c/dev/ai-systems-portfolio/context-harness/scripts/sync-vaults.sh MyLaptop "C:/MY VAULT"
+bash <repo folder>/context-harness/scripts/sync-vaults.sh MyLaptop "<your vault>"
 ```
 
 Keep the global rules file in a private repo too, so every machine loads the same rules.
@@ -383,7 +382,7 @@ Keep the global rules file in a private repo too, so every machine loads the sam
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `CERTIFICATE_VERIFY_FAILED` on downloads | Antivirus re-signs HTTPS (Norton, Kaspersky…) | Already handled with `truststore` in `dl.py` / `ytdl.py`. For other scripts add `import truststore; truststore.inject_into_ssl()` at the top. Never switch certificate checks off |
+| `CERTIFICATE_VERIFY_FAILED` on downloads | Antivirus re-signs HTTPS (some antivirus products) | Already handled with `truststore` in `dl.py` / `ytdl.py`. For other scripts add `import truststore; truststore.inject_into_ssl()` at the top. Never switch certificate checks off |
 | `Library cublas64_12.dll is not found` | Windows does not see pip's GPU libraries | `pip install nvidia-cublas-cu12 nvidia-cudnn-cu12`; the scripts add those folders at start-up (top of `transcribe.py`) |
 | `open() got an unexpected keyword argument 'metadata_errors'` | PyAV 19 vs faster-whisper's own decoder | Pass audio as a numpy array (as `transcribe.py` and `prepare_vod.py` do), or `pip install "av<19"` |
 | YouTube: "Sign in to confirm you're not a bot" | Too many requests, or a datacentre IP | Stop, wait some hours, run from a home connection; add your cookies (section 8). Do not loop retries |
@@ -404,7 +403,7 @@ Keep the global rules file in a private repo too, so every machine loads the sam
 - Update tools: `.\.venv\Scripts\python -m pip install -U "yt-dlp[default]"` (do this first whenever downloads break); `winget upgrade --all`; `ollama pull <model>` again for a newer build.
 - Free disk: delete `work\<id>\proxy.mp4`, `audio*.wav` and `stems\` after a film card is written; delete videos in `video\`.
 - Remove models: `ollama rm qwen3-vl:8b`; delete `%USERPROFILE%\.cache\huggingface\hub\models--Systran--faster-whisper-*`.
-- Remove everything: delete `C:\dev\ai-systems-portfolio` and uninstall the winget packages.
+- Remove everything: delete `<repo folder>` and uninstall the winget packages.
 
 ---
 

@@ -87,12 +87,11 @@
 
 <h2>1. Get the code</h2>
 <pre><code class="language-powershell">winget install --id Git.Git -e --source winget
-cd C:\
-mkdir dev; cd dev
-git clone https://github.com/&lt;owner&gt;/&lt;this-repo&gt;.git ai-systems-portfolio
+cd &lt;a folder for your code&gt;
+git clone https://github.com/yushaaanan-design/ai-systems-portfolio.git ai-systems-portfolio
 cd ai-systems-portfolio
 </code></pre>
-<p>No Git? Click <strong>Code → Download ZIP</strong> on GitHub and unzip it to <code>C:\dev\ai-systems-portfolio</code>.</p>
+<p>No Git? Click <strong>Code → Download ZIP</strong> on GitHub and unzip it to a folder of your choice (called <code>&lt;repo folder&gt;</code> below).</p>
 <blockquote>
 <p>Keep code outside OneDrive and outside any Obsidian vault. Syncing services lock files mid-run and upload multi-GB videos.</p>
 </blockquote>
@@ -141,7 +140,7 @@ nvidia-smi                # shows your GPU and free memory
 
 <h2>3. Create the two Python environments</h2>
 <p>Two environments, because Demucs and SpeechBrain pin their own PyTorch build, which can clash with the main tools.</p>
-<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio
+<pre><code class="language-powershell">cd &lt;repo folder&gt;
 
 # main environment
 py -3.13 -m venv .venv
@@ -157,7 +156,7 @@ py -3.13 -m venv .venv-audio
 <ul>
 <li>No NVIDIA GPU? Use <code>--index-url https://download.pytorch.org/whl/cpu</code> for torch and skip the two <code>nvidia-*</code> lines in <code>requirements.txt</code>.</li>
 <li>"running scripts is disabled on this system": run <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> once, or always call <code>.\.venv\Scripts\python</code> directly as shown (no activation needed).</li>
-<li>The film scripts call <code>py -3.13</code>. To use the venv instead, replace <code>py -3.13</code> with <code>C:\dev\ai-systems-portfolio\.venv\Scripts\python</code> in <code>run_film.ps1</code>, or install the requirements into the <code>py -3.13</code> Python as well.</li>
+<li>The film scripts call <code>py -3.13</code>. To use the venv instead, replace <code>py -3.13</code> with <code>&lt;repo folder&gt;\.venv\Scripts\python</code> in <code>run_film.ps1</code>, or install the requirements into the <code>py -3.13</code> Python as well.</li>
 </ul>
 <p><strong>Check:</strong></p>
 <pre><code class="language-powershell">.\.venv\Scripts\python -c &quot;import yt_dlp, faster_whisper, scenedetect, cv2, truststore, psutil, feedparser; print('main OK')&quot;
@@ -209,7 +208,7 @@ ollama list
 </code></pre>
 
 <h2>5. Folder layout after setup</h2>
-<pre><code>C:\dev\ai-systems-portfolio\
+<pre><code>&lt;repo folder&gt;\
   .venv\  .venv-audio\
   video-pipeline\
     2-film-analysis\
@@ -238,14 +237,14 @@ ollama list
 <tr>
 <td><code>2-film-analysis/run_film.ps1</code></td>
 <td><code>$root</code></td>
-<td><code>C:\dev\documentary</code></td>
-<td><code>C:\dev\ai-systems-portfolio\video-pipeline\2-film-analysis</code></td>
+<td>the authors' project folder</td>
+<td><code>&lt;repo folder&gt;\video-pipeline\2-film-analysis</code></td>
 </tr>
 <tr>
 <td><code>2-film-analysis/run_film.ps1</code></td>
 <td><code>$vs</code></td>
 <td>another app's Python</td>
-<td><code>C:\dev\ai-systems-portfolio\.venv-audio\Scripts\python.exe</code></td>
+<td><code>&lt;repo folder&gt;\.venv-audio\Scripts\python.exe</code></td>
 </tr>
 <tr>
 <td><code>2-film-analysis/run_film.ps1</code></td>
@@ -268,13 +267,13 @@ ollama list
 <tr>
 <td><code>1-intake/reel_bot.py</code></td>
 <td><code>OUT</code>, <code>COOKIES</code>, <code>YTDLP</code>, <code>FFMPEG</code></td>
-<td><code>C:\dev\reels\...</code>, a separate venv</td>
+<td>the authors' folders, a separate venv</td>
 <td>your inbox folder, your cookie file, <code>.venv\Scripts\python.exe</code>, your FFmpeg <code>bin</code> folder</td>
 </tr>
 <tr>
 <td><code>1-intake/loop.py</code>, <code>report.py</code>, <code>reellog.py</code>, <code>screentext.py</code>, <code>collect_links.py</code></td>
 <td><code>ROOT</code>, <code>ANALYZE</code>, <code>OUT</code>, <code>FFMPEG</code>, <code>VAULT_DIGESTS</code></td>
-<td><code>C:\dev\reels</code>, vault paths</td>
+<td>the authors' folders and vault</td>
 <td>your folders (see the note in 7.5)</td>
 </tr>
 <tr>
@@ -291,7 +290,7 @@ ollama list
 </tr>
 <tr>
 <td><code>3-shorts-clipper/chief/core.py</code></td>
-<td><code>notify()</code> path <code>C:\dev\reels\bot</code></td>
+<td><code>notify()</code> bot path</td>
 <td>the bot folder</td>
 <td>your <code>1-intake</code> folder, or set <code>"notify_telegram": false</code> in <code>config/budget.json</code></td>
 </tr>
@@ -306,7 +305,7 @@ ollama list
 
 <h2>7. Run it</h2>
 <h3>7.1 Analyse one YouTube video, frame by frame</h3>
-<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio\video-pipeline\2-film-analysis
+<pre><code class="language-powershell">cd &lt;repo folder&gt;\video-pipeline\2-film-analysis
 .\run_film.ps1 -Id &lt;youtube_id&gt; -Stage cpu     # download, audio, proxy, cuts + motion, contact sheets
 .\run_film.ps1 -Id &lt;youtube_id&gt; -Stage gpu     # Whisper, Demucs, audio report, voices, Qwen frame tags
 py -3.13 .\film_card.py .\work\&lt;youtube_id&gt;     # the one-page summary
@@ -355,7 +354,7 @@ py -3.13 .\film_card.py .\work\&lt;code&gt;
 <p>Instagram needs your logged-in session as a cookie file (section 8). Save it as <code>2-film-analysis\cookies.txt</code>, which is where <code>dl.py</code> looks. Public YouTube videos work without it.</p>
 <h3>7.3 Let Claude write the study document</h3>
 <p>Open Claude Code in the work folder and paste a prompt like this:</p>
-<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio\video-pipeline\2-film-analysis\work\&lt;id&gt;
+<pre><code class="language-powershell">cd &lt;repo folder&gt;\video-pipeline\2-film-analysis\work\&lt;id&gt;
 claude
 </code></pre>
 <pre><code>Read film_card.md and transcript.txt, then look at sheets/sheet_00.jpg to the last sheet.
@@ -366,7 +365,7 @@ Label anything you infer as a guess.
 </code></pre>
 <p>This is the step that keeps the cost at about 18,000 tokens for an 18-minute film instead of hundreds of thousands.</p>
 <h3>7.4 Long video → short clips</h3>
-<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio\video-pipeline\3-shorts-clipper
+<pre><code class="language-powershell">cd &lt;repo folder&gt;\video-pipeline\3-shorts-clipper
 ..\..\.venv\Scripts\python -X utf8 chief\run_all.py --selftest                  # checks the queue and lock
 ..\..\.venv\Scripts\python -X utf8 ingest\prepare_vod.py &quot;&lt;youtube link&gt;&quot;       # download + transcript + loudness, queues the jobs
 ..\..\.venv\Scripts\python -X utf8 chief\run_all.py                             # moments -&gt; writer -&gt; cutter
@@ -385,7 +384,7 @@ Label anything you infer as a guess.
 <p><strong>Step 2.</strong> BotFather replies with a token. Save it <strong>only</strong> in <code>video-pipeline\1-intake\.telegram-token</code> (one line, no quotes). Never paste it in a chat or commit it.</p>
 <p><strong>Step 3.</strong> Set <code>OUT</code>, <code>COOKIES</code>, <code>YTDLP</code> and <code>FFMPEG</code> at the top of <code>reel_bot.py</code> (section 6).</p>
 <p><strong>Step 4.</strong> Test the link reader, then start the bot:</p>
-<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio\video-pipeline\1-intake
+<pre><code class="language-powershell">cd &lt;repo folder&gt;\video-pipeline\1-intake
 ..\..\.venv\Scripts\python reel_bot.py --selftest     # prints &quot;selftest ok&quot;
 ..\..\.venv\Scripts\python reel_bot.py
 </code></pre>
@@ -407,9 +406,9 @@ Label anything you infer as a guess.
 
 <h2>9. Set up the context harness (the assistant's memory)</h2>
 <h3>9.1 Make the vault</h3>
-<p><strong>Step 1.</strong> Open Obsidian → <strong>Create new vault</strong> → name it, place it <strong>outside</strong> <code>C:\dev</code> (e.g. <code>C:\MY VAULT</code>).</p>
+<p><strong>Step 1.</strong> Open Obsidian → <strong>Create new vault</strong> → name it, place it <strong>outside</strong> your code folder (e.g. <code>&lt;your vault&gt;</code>).</p>
 <p><strong>Step 2.</strong> Create this structure and copy the templates from <code>context-harness\templates\</code>:</p>
-<pre><code>MY VAULT\
+<pre><code>&lt;your vault&gt;\
   INDEX.md                       a list of projects, one line each
   Harness\Preferences.md         how you want the assistant to work
   Harness\Lessons.md             symptom | cause | fix
@@ -425,7 +424,7 @@ Label anything you infer as a guess.
 <p>Create <code>%USERPROFILE%\.claude\CLAUDE.md</code> (Claude Code loads it in every session) with the rules from <code>context-harness\CLAUDE.example.md</code>. Put in your vault's real paths. The key rules: never rebuild context from the chat, read Preferences → Registry → Resume Protocol → STATE → the end of run-log, write back to run-log/STATE after each step, add a Lessons row for every mistake, and run the Eval Checklist before saying done.</p>
 <p>Test it: open a new Claude Code session and ask "what is the state of <code>my-project</code>?". It should read the notes and cite them.</p>
 <h3>9.3 Share it across PCs and accounts</h3>
-<pre><code class="language-powershell">cd &quot;C:\MY VAULT&quot;
+<pre><code class="language-powershell">cd &quot;&lt;your vault&gt;&quot;
 git init -b main
 Add-Content .gitignore &quot;.obsidian/workspace*.json`n.trash/&quot;
 git add -A; git commit -m &quot;First vault commit&quot;
@@ -434,7 +433,7 @@ gh repo create my-vault --private --source . --push        # or create a private
 <p>On every other PC: install Obsidian, Git and Claude Code, <code>git clone</code> the private repo, open it as a vault, and copy the same <code>CLAUDE.md</code>. Any Claude account signed in on any of those PCs now starts from the same notes.</p>
 <p>Daily sync (pull, then commit and push only changed notes after a secret scan; stops on a conflict or a secret):</p>
 <pre><code class="language-bash"># Git Bash
-bash /c/dev/ai-systems-portfolio/context-harness/scripts/sync-vaults.sh MyLaptop &quot;C:/MY VAULT&quot;
+bash &lt;repo folder&gt;/context-harness/scripts/sync-vaults.sh MyLaptop &quot;&lt;your vault&gt;&quot;
 </code></pre>
 <p>Keep the global rules file in a private repo too, so every machine loads the same rules.</p>
 <h3>9.4 Optional: a generated ontology vault</h3>
@@ -452,7 +451,7 @@ bash /c/dev/ai-systems-portfolio/context-harness/scripts/sync-vaults.sh MyLaptop
 <tbody>
 <tr>
 <td><code>CERTIFICATE_VERIFY_FAILED</code> on downloads</td>
-<td>Antivirus re-signs HTTPS (Norton, Kaspersky…)</td>
+<td>Antivirus re-signs HTTPS (some antivirus products)</td>
 <td>Already handled with <code>truststore</code> in <code>dl.py</code> / <code>ytdl.py</code>. For other scripts add <code>import truststore; truststore.inject_into_ssl()</code> at the top. Never switch certificate checks off</td>
 </tr>
 <tr>
@@ -523,7 +522,7 @@ bash /c/dev/ai-systems-portfolio/context-harness/scripts/sync-vaults.sh MyLaptop
 <li>Update tools: <code>.\.venv\Scripts\python -m pip install -U "yt-dlp[default]"</code> (do this first whenever downloads break); <code>winget upgrade --all</code>; <code>ollama pull &lt;model&gt;</code> again for a newer build.</li>
 <li>Free disk: delete <code>work\&lt;id&gt;\proxy.mp4</code>, <code>audio*.wav</code> and <code>stems\</code> after a film card is written; delete videos in <code>video\</code>.</li>
 <li>Remove models: <code>ollama rm qwen3-vl:8b</code>; delete <code>%USERPROFILE%\.cache\huggingface\hub\models--Systran--faster-whisper-*</code>.</li>
-<li>Remove everything: delete <code>C:\dev\ai-systems-portfolio</code> and uninstall the winget packages.</li>
+<li>Remove everything: delete <code>&lt;repo folder&gt;</code> and uninstall the winget packages.</li>
 </ul>
 
 <h2>12. Rules worth keeping</h2>
