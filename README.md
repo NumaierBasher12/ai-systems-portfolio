@@ -7,7 +7,7 @@ Two working systems, built and used every day by a two-person student team on or
 | 1 | [Context harness](context-harness/) | An Obsidian ontology graph that gives an AI assistant long-term, shared memory across PCs and accounts, and learns from its own mistakes |
 | 2 | [Video understanding pipeline](video-pipeline/) | yt-dlp + FFmpeg + Whisper + local vision models + Claude: turns long YouTube videos, Instagram Reels and Telegram-sent videos into study notes and short clips |
 
-Full explanations with diagrams: [`docs/AI-Systems-Overview.pdf`](docs/AI-Systems-Overview.pdf). **Install it on your own PC:** [`SETUP.md`](SETUP.md) (also as [`docs/Setup-Guide.pdf`](docs/Setup-Guide.pdf)).
+Full explanations with diagrams: [`docs/AI-Systems-Overview.pdf`](docs/AI-Systems-Overview.pdf). Step-by-step student guide: [`docs/Junior-Guide.pdf`](docs/Junior-Guide.pdf). **Install it on your own PC:** [`SETUP.md`](SETUP.md) (also as [`docs/Setup-Guide.pdf`](docs/Setup-Guide.pdf)).
 
 ## 1. Context harness
 

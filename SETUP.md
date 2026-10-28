@@ -36,7 +36,7 @@ Models you will download (once):
 winget install --id Git.Git -e --source winget
 cd C:\
 mkdir dev; cd dev
-git clone https://github.com/<owner>/<this-repo>.git ai-systems-portfolio
+git clone https://github.com/yushaaanan-design/ai-systems-portfolio.git ai-systems-portfolio
 cd ai-systems-portfolio
 ```
 
