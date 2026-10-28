@@ -1,0 +1,536 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Setup Guide</title>
+<link rel="stylesheet" href="style.css">
+<style>td code, th code { white-space: normal; word-break: break-word; } blockquote { border-left: 3px solid var(--c); background:#fff4ee; margin: 6pt 0; padding: 5pt 9pt; } pre code { background: none; padding: 0; }</style></head><body>
+<section class="cover"><div class="kicker">Setup guide · October 2026</div>
+<h1>Run both systems on your own PC</h1>
+<p class="sub">From a clean Windows 11 PC to a working setup: tools, two Python environments, local models (Whisper, Qwen, Demucs, ECAPA), path settings, first runs for a YouTube film, an Instagram Reel, long-video-to-shorts and the Telegram bot, then the Obsidian context harness shared across PCs.</p>
+<div class="kpis"><div class="kpi"><b>1–2 h</b><span>mostly downloads</span></div><div class="kpi"><b>≈25 GB</b><span>tools and models</span></div><div class="kpi"><b>16 GB / 6 GB</b><span>RAM / NVIDIA VRAM (CPU-only works, slower)</span></div></div>
+<p class="small">Same content as SETUP.md in the repository.</p></section>
+<p>This guide takes a clean Windows 11 PC to a working setup: analysing a YouTube video, an Instagram Reel or a TikTok frame by frame, turning a long stream into short clips, receiving links through your own Telegram bot, and keeping an AI assistant's memory in an Obsidian vault shared across PCs.</p>
+<p>Every step names the exact command. Where the code still holds the authors' machine paths, section 6 lists each one and what to change it to.</p>
+<p><strong>Time:</strong> about 1–2 hours, mostly downloads. <strong>Disk:</strong> about 25 GB (tools + models) plus space for videos.</p>
+
+<h2>0. What you need</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Minimum</th>
+<th>What the authors use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OS</td>
+<td>Windows 10/11 64-bit (Linux and macOS work with the notes in each step)</td>
+<td>Windows 11</td>
+</tr>
+<tr>
+<td>RAM</td>
+<td>16 GB</td>
+<td>16 GB</td>
+</tr>
+<tr>
+<td>GPU</td>
+<td>NVIDIA with 6 GB VRAM (CPU-only works, but is much slower)</td>
+<td>RTX laptop GPU, 6–8 GB</td>
+</tr>
+<tr>
+<td>Disk</td>
+<td>50 GB free</td>
+<td></td>
+</tr>
+<tr>
+<td>Accounts</td>
+<td>GitHub (free); Claude Pro or Max for the Claude steps; Telegram for the bot (optional); Instagram only for Reels</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Models you will download (once):</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Size</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>faster-whisper <code>large-v3</code> (or <code>large-v3-turbo</code> / <code>small</code> for speed)</td>
+<td>3.1 GB (1.6 GB / 0.5 GB)</td>
+<td>Speech to text with word times</td>
+</tr>
+<tr>
+<td>Qwen3-VL 8B via Ollama</td>
+<td>about 6 GB</td>
+<td>Describing frames</td>
+</tr>
+<tr>
+<td>Qwen3 4B via Ollama</td>
+<td>about 2.5 GB</td>
+<td>Backup judge, voice check</td>
+</tr>
+<tr>
+<td>Demucs <code>htdemucs</code></td>
+<td>about 80 MB</td>
+<td>Voice / music split</td>
+</tr>
+<tr>
+<td>SpeechBrain ECAPA</td>
+<td>about 80 MB</td>
+<td>Speaker fingerprints</td>
+</tr>
+</tbody>
+</table>
+
+<h2>1. Get the code</h2>
+<pre><code class="language-powershell">winget install --id Git.Git -e --source winget
+cd C:\
+mkdir dev; cd dev
+git clone https://github.com/&lt;owner&gt;/&lt;this-repo&gt;.git ai-systems-portfolio
+cd ai-systems-portfolio
+</code></pre>
+<p>No Git? Click <strong>Code → Download ZIP</strong> on GitHub and unzip it to <code>C:\dev\ai-systems-portfolio</code>.</p>
+<blockquote>
+<p>Keep code outside OneDrive and outside any Obsidian vault. Syncing services lock files mid-run and upload multi-GB videos.</p>
+</blockquote>
+
+<h2>2. Install the base tools</h2>
+<p>Open <strong>PowerShell</strong> (no admin needed for most of these) and run one line at a time:</p>
+<pre><code class="language-powershell">winget install --id Python.Python.3.13 -e --source winget      # Python + the &quot;py&quot; launcher
+winget install --id Gyan.FFmpeg -e --source winget              # FFmpeg + ffprobe
+winget install --id OpenJS.NodeJS.LTS -e --source winget        # Node.js: yt-dlp needs it for YouTube
+winget install --id Ollama.Ollama -e --source winget            # runs Qwen locally
+winget install --id Obsidian.Obsidian -e --source winget        # the note vault (harness)
+winget install --id GitHub.cli -e --source winget               # optional: gh, for private repos
+</code></pre>
+<p>Then <strong>close and reopen PowerShell</strong> so the new commands are on your PATH.</p>
+<p><strong>NVIDIA driver:</strong> install the latest Game Ready or Studio driver from nvidia.com. You do <strong>not</strong> need the CUDA toolkit: the GPU libraries come from pip in step 3.</p>
+<p><strong>Claude Code</strong> (for the "Claude reads the summary" steps and the clipper's judge/writer):</p>
+<pre><code class="language-powershell">npm install -g @anthropic-ai/claude-code
+claude          # first run opens a browser to log in with your Claude account
+</code></pre>
+<p>The clipper calls <code>claude -p</code> in the background, so you must have logged in once on this PC.</p>
+<table>
+<thead>
+<tr>
+<th>Linux (Ubuntu)</th>
+<th>macOS (Homebrew)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sudo apt install git python3.13 python3.13-venv ffmpeg nodejs npm</code></td>
+<td><code>brew install git python@3.13 ffmpeg node ollama</code></td>
+</tr>
+<tr>
+<td>Ollama: <code>curl -fsSL https://ollama.com/install.sh \| sh</code></td>
+<td>Obsidian: <code>brew install --cask obsidian</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Check:</strong></p>
+<pre><code class="language-powershell">py -3.13 --version        # Python 3.13.x
+ffmpeg -version           # first line: ffmpeg version ...
+node -v                   # v20 or newer
+ollama --version
+nvidia-smi                # shows your GPU and free memory
+</code></pre>
+
+<h2>3. Create the two Python environments</h2>
+<p>Two environments, because Demucs and SpeechBrain pin their own PyTorch build, which can clash with the main tools.</p>
+<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio
+
+# main environment
+py -3.13 -m venv .venv
+.\.venv\Scripts\python -m pip install --upgrade pip
+.\.venv\Scripts\python -m pip install -r requirements.txt
+
+# audio environment
+py -3.13 -m venv .venv-audio
+.\.venv-audio\Scripts\python -m pip install --upgrade pip
+.\.venv-audio\Scripts\python -m pip install torch==2.8.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cu128
+.\.venv-audio\Scripts\python -m pip install -r requirements-audio.txt
+</code></pre>
+<ul>
+<li>No NVIDIA GPU? Use <code>--index-url https://download.pytorch.org/whl/cpu</code> for torch and skip the two <code>nvidia-*</code> lines in <code>requirements.txt</code>.</li>
+<li>"running scripts is disabled on this system": run <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> once, or always call <code>.\.venv\Scripts\python</code> directly as shown (no activation needed).</li>
+<li>The film scripts call <code>py -3.13</code>. To use the venv instead, replace <code>py -3.13</code> with <code>C:\dev\ai-systems-portfolio\.venv\Scripts\python</code> in <code>run_film.ps1</code>, or install the requirements into the <code>py -3.13</code> Python as well.</li>
+</ul>
+<p><strong>Check:</strong></p>
+<pre><code class="language-powershell">.\.venv\Scripts\python -c &quot;import yt_dlp, faster_whisper, scenedetect, cv2, truststore, psutil, feedparser; print('main OK')&quot;
+.\.venv-audio\Scripts\python -c &quot;import demucs, speechbrain, soundfile, scipy, torch; print('audio OK, CUDA:', torch.cuda.is_available())&quot;
+</code></pre>
+
+<h2>4. Download the models</h2>
+<p><strong>Whisper</strong> (the film script loads it with <code>local_files_only=True</code>, so download it once first):</p>
+<pre><code class="language-powershell">.\.venv\Scripts\python -c &quot;from faster_whisper import WhisperModel; WhisperModel('large-v3', device='cpu', compute_type='int8'); print('whisper ready')&quot;
+</code></pre>
+<p><strong>Qwen models through Ollama</strong> (Ollama runs in the background after install; the tray icon shows it):</p>
+<pre><code class="language-powershell">ollama pull qwen3-vl:8b      # vision: describes frames
+ollama pull qwen3:4b         # text: backup judge and voice check
+ollama list
+</code></pre>
+<p>The authors used community builds of the same models (<code>huihui_ai/qwen3-vl-abliterated:8b-instruct</code>, <code>huihui_ai/qwen3-abliterated:4b</code>). The official ones above work the same way. Set the names here:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Line</th>
+<th>Set to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>video-pipeline/2-film-analysis/tag.py</code></td>
+<td><code>MODEL = ...</code></td>
+<td><code>"qwen3-vl:8b"</code></td>
+</tr>
+<tr>
+<td><code>video-pipeline/2-film-analysis/run_film.ps1</code></td>
+<td><code>ollama stop ...</code></td>
+<td><code>ollama stop qwen3-vl:8b</code></td>
+</tr>
+<tr>
+<td><code>video-pipeline/3-shorts-clipper/moments/finder.py</code></td>
+<td><code>JUDGE_MODEL = ...</code></td>
+<td><code>"qwen3:4b"</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Speaker model</strong> (SpeechBrain ECAPA, into the folder <code>voices.py</code> expects):</p>
+<pre><code class="language-powershell">.\.venv-audio\Scripts\python -c &quot;from huggingface_hub import snapshot_download; snapshot_download('speechbrain/spkrec-ecapa-voxceleb', local_dir=r'video-pipeline\2-film-analysis\models\ecapa'); print('ecapa ready')&quot;
+</code></pre>
+<p><strong>Demucs</strong> downloads <code>htdemucs</code> by itself on its first run.</p>
+<p><strong>Quick model test:</strong></p>
+<pre><code class="language-powershell">ollama run qwen3:4b &quot;Reply with the single word: ready&quot;
+</code></pre>
+
+<h2>5. Folder layout after setup</h2>
+<pre><code>C:\dev\ai-systems-portfolio\
+  .venv\  .venv-audio\
+  video-pipeline\
+    2-film-analysis\
+      models\ecapa\          speaker model (step 4)
+      video\                 downloaded films land here (dl.py)
+      work\&lt;video_id&gt;\       every output for one film
+      cookies.txt            OPTIONAL, your exported cookies (never commit)
+    3-shorts-clipper\
+      work\&lt;video_id&gt;\       long video, transcript, clips\
+      data\assistant.db      job queue (created on first run)
+</code></pre>
+<p><code>video\</code>, <code>work\</code>, <code>models\</code>, databases, cookies and tokens are already in <code>.gitignore</code>.</p>
+
+<h2>6. Point the scripts at your PC</h2>
+<p>The scripts are shown exactly as they ran, so a few constants still name the authors' folders. Change these once (open the file in any editor, search for the line).</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Constant / line</th>
+<th>Authors' value</th>
+<th>Change to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>2-film-analysis/run_film.ps1</code></td>
+<td><code>$root</code></td>
+<td><code>C:\dev\documentary</code></td>
+<td><code>C:\dev\ai-systems-portfolio\video-pipeline\2-film-analysis</code></td>
+</tr>
+<tr>
+<td><code>2-film-analysis/run_film.ps1</code></td>
+<td><code>$vs</code></td>
+<td>another app's Python</td>
+<td><code>C:\dev\ai-systems-portfolio\.venv-audio\Scripts\python.exe</code></td>
+</tr>
+<tr>
+<td><code>2-film-analysis/run_film.ps1</code></td>
+<td><code>$ff</code></td>
+<td>winget FFmpeg folder</td>
+<td>keep it if you installed FFmpeg with winget; otherwise the folder holding <code>ffmpeg.exe</code></td>
+</tr>
+<tr>
+<td><code>2-film-analysis/run_film.ps1</code></td>
+<td><code>-c:v h264_nvenc -preset p4 -cq 20</code></td>
+<td>NVIDIA encoder</td>
+<td>no NVIDIA GPU: <code>-c:v libx264 -preset veryfast -crf 20</code></td>
+</tr>
+<tr>
+<td><code>2-film-analysis/dl.py</code></td>
+<td>the FFmpeg <code>glob</code></td>
+<td>winget folder</td>
+<td>same rule as <code>$ff</code></td>
+</tr>
+<tr>
+<td><code>1-intake/reel_bot.py</code></td>
+<td><code>OUT</code>, <code>COOKIES</code>, <code>YTDLP</code>, <code>FFMPEG</code></td>
+<td><code>C:\dev\reels\...</code>, a separate venv</td>
+<td>your inbox folder, your cookie file, <code>.venv\Scripts\python.exe</code>, your FFmpeg <code>bin</code> folder</td>
+</tr>
+<tr>
+<td><code>1-intake/loop.py</code>, <code>report.py</code>, <code>reellog.py</code>, <code>screentext.py</code>, <code>collect_links.py</code></td>
+<td><code>ROOT</code>, <code>ANALYZE</code>, <code>OUT</code>, <code>FFMPEG</code>, <code>VAULT_DIGESTS</code></td>
+<td><code>C:\dev\reels</code>, vault paths</td>
+<td>your folders (see the note in 7.5)</td>
+</tr>
+<tr>
+<td><code>3-shorts-clipper/config/sources.json</code></td>
+<td><code>brand_voice_note</code>, <code>playbook_note</code>, <code>review_dir</code>, <code>digest_dir</code></td>
+<td>vault paths</td>
+<td>notes in your own vault (missing notes are simply skipped)</td>
+</tr>
+<tr>
+<td><code>3-shorts-clipper/config/sources.json</code></td>
+<td><code>facecam</code></td>
+<td>one streamer's webcam box</td>
+<td>the x/y/w/h of the webcam in your source video, or delete it for the blurred layout</td>
+</tr>
+<tr>
+<td><code>3-shorts-clipper/chief/core.py</code></td>
+<td><code>notify()</code> path <code>C:\dev\reels\bot</code></td>
+<td>the bot folder</td>
+<td>your <code>1-intake</code> folder, or set <code>"notify_telegram": false</code> in <code>config/budget.json</code></td>
+</tr>
+<tr>
+<td><code>3-shorts-clipper/writer/writer.py</code></td>
+<td><code>CLIPS_DB</code></td>
+<td>the authors' study database</td>
+<td>leave it: a missing database is handled</td>
+</tr>
+</tbody>
+</table>
+
+<h2>7. Run it</h2>
+<h3>7.1 Analyse one YouTube video, frame by frame</h3>
+<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio\video-pipeline\2-film-analysis
+.\run_film.ps1 -Id &lt;youtube_id&gt; -Stage cpu     # download, audio, proxy, cuts + motion, contact sheets
+.\run_film.ps1 -Id &lt;youtube_id&gt; -Stage gpu     # Whisper, Demucs, audio report, voices, Qwen frame tags
+py -3.13 .\film_card.py .\work\&lt;youtube_id&gt;     # the one-page summary
+</code></pre>
+<p><code>&lt;youtube_id&gt;</code> is the part after <code>v=</code> in the link (<code>https://www.youtube.com/watch?v=jNQXAC9IVRw</code> → <code>jNQXAC9IVRw</code>).</p>
+<p>Two stages so the GPU holds one heavy model at a time. Run the GPU stage when nothing else uses the GPU.</p>
+<p><strong>What you get</strong> in <code>work\&lt;id&gt;\</code>:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>What it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>film_card.md</code></td>
+<td>Every number on one page, by chapter: cuts per minute, words per minute, music level, camera moves, media mix, voices, longest pauses and the line before each</td>
+</tr>
+<tr>
+<td><code>transcript.txt</code> / <code>transcript.json</code></td>
+<td>Every sentence with its time / every word with start and end</td>
+</tr>
+<tr>
+<td><code>shots.csv</code></td>
+<td>One row per shot: start, length, brightness, camera move, 5-colour palette</td>
+</tr>
+<tr>
+<td><code>sheets\sheet_NN.jpg</code></td>
+<td>48 shots per image, for reading the film by eye</td>
+</tr>
+<tr>
+<td><code>audio_report.json</code>, <code>voices.json</code>, <code>tags.jsonl</code></td>
+<td>The raw measurements behind the card</td>
+</tr>
+</tbody>
+</table>
+<p>Need a closer look at a few shots? <code>py -3.13 .\sheets.py .\work\&lt;id&gt; strip 12 40 133</code> writes 8 frames across each of those shots.</p>
+<h3>7.2 Analyse an Instagram Reel or a TikTok</h3>
+<p><code>run_film.ps1</code> only downloads from YouTube by itself. For other sites, download first with <code>dl.py</code> (it names the file by the post's id), then run the same stages:</p>
+<pre><code class="language-powershell">py -3.13 .\dl.py &quot;https://www.instagram.com/reel/&lt;code&gt;/&quot; .\video
+.\run_film.ps1 -Id &lt;code&gt; -Stage cpu
+.\run_film.ps1 -Id &lt;code&gt; -Stage gpu
+py -3.13 .\film_card.py .\work\&lt;code&gt;
+</code></pre>
+<p>Instagram needs your logged-in session as a cookie file (section 8). Save it as <code>2-film-analysis\cookies.txt</code>, which is where <code>dl.py</code> looks. Public YouTube videos work without it.</p>
+<h3>7.3 Let Claude write the study document</h3>
+<p>Open Claude Code in the work folder and paste a prompt like this:</p>
+<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio\video-pipeline\2-film-analysis\work\&lt;id&gt;
+claude
+</code></pre>
+<pre><code>Read film_card.md and transcript.txt, then look at sheets/sheet_00.jpg to the last sheet.
+Do not open frames one by one or read the json/npz files.
+Write study-notes.md: a 10-line summary, the structure with timestamps, the key ideas,
+how it is edited (pace, cuts, camera, sound) with numbers from the card, and 5 questions to test understanding.
+Label anything you infer as a guess.
+</code></pre>
+<p>This is the step that keeps the cost at about 18,000 tokens for an 18-minute film instead of hundreds of thousands.</p>
+<h3>7.4 Long video → short clips</h3>
+<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio\video-pipeline\3-shorts-clipper
+..\..\.venv\Scripts\python -X utf8 chief\run_all.py --selftest                  # checks the queue and lock
+..\..\.venv\Scripts\python -X utf8 ingest\prepare_vod.py &quot;&lt;youtube link&gt;&quot;       # download + transcript + loudness, queues the jobs
+..\..\.venv\Scripts\python -X utf8 chief\run_all.py                             # moments -&gt; writer -&gt; cutter
+</code></pre>
+<p><code>prepare_vod.py</code> options: <code>--model large-v3-turbo</code> (faster), <code>--cookies &lt;file&gt;</code>, <code>--top 3</code> (how many clips to cut).</p>
+<p><strong>What you get</strong> in <code>work\&lt;video_id&gt;\</code>:</p>
+<ul>
+<li><code>sheets\top10.jpg</code>: three frames for each of the 10 best moments, with scores</li>
+<li><code>clips\01_&lt;start&gt;.mp4</code> …: 1080×1920 draft clips with word-highlighted captions and a pinned label</li>
+<li>The scores, reasons, hooks, titles and captions, in <code>data\assistant.db</code> (tables <code>candidates</code>, <code>drafts</code>, <code>clips</code>)</li>
+</ul>
+<p>Nothing is posted anywhere. Watch the clips and decide yourself. The windows are 25–62 s, so use a source video of at least 10 minutes.</p>
+<p>If Claude is not logged in or the nightly budget (<code>config\budget.json</code>) is spent, the judge falls back to the local Qwen model, and the writer step reports "no copy written". The clips are still cut.</p>
+<h3>7.5 Your own Telegram bot (send links from your phone)</h3>
+<p><strong>Step 1.</strong> In Telegram, open <strong>@BotFather</strong>, send <code>/newbot</code>, choose a name and a username ending in <code>bot</code>.</p>
+<p><strong>Step 2.</strong> BotFather replies with a token. Save it <strong>only</strong> in <code>video-pipeline\1-intake\.telegram-token</code> (one line, no quotes). Never paste it in a chat or commit it.</p>
+<p><strong>Step 3.</strong> Set <code>OUT</code>, <code>COOKIES</code>, <code>YTDLP</code> and <code>FFMPEG</code> at the top of <code>reel_bot.py</code> (section 6).</p>
+<p><strong>Step 4.</strong> Test the link reader, then start the bot:</p>
+<pre><code class="language-powershell">cd C:\dev\ai-systems-portfolio\video-pipeline\1-intake
+..\..\.venv\Scripts\python reel_bot.py --selftest     # prints &quot;selftest ok&quot;
+..\..\.venv\Scripts\python reel_bot.py
+</code></pre>
+<p><strong>Step 5.</strong> Open <code>pair-code.txt</code> in the same folder and send <code>/start</code> followed by that code to your bot. From then on it obeys only you.</p>
+<p><strong>Step 6.</strong> Send any Instagram, YouTube or TikTok link (or a video under 20 MB). The file lands in <code>OUT</code>. <code>/status</code> shows the cookie age and whether Instagram is paused.</p>
+<p><strong>Step 7.</strong> Analyse it with 7.1 / 7.2.</p>
+<p><code>loop.py</code> (collect saved Instagram collections → download → analyse, every N minutes) is included as reference. Its analysis step calls the authors' earlier single-reel analyser, <code>analyze_reel.py</code>, which is not in this repository. Use 7.2 for analysis instead. <code>collect_links.py</code> needs <code>python -m playwright install chromium</code> once.</p>
+<h3>7.6 The clip study (reference)</h3>
+<p><code>4-clip-study/cycle.py</code> is the resumable study that measured 1,000+ Shorts. Like <code>loop.py</code>, it calls <code>analyze_reel.py</code>, so treat it as reference code showing the method: queue, polite pacing, STOP file, delete video after analysis, comments without usernames.</p>
+
+<h2>8. Cookies, safely (only for Instagram or age-gated videos)</h2>
+<ol>
+<li>In Chrome, install the open-source extension <strong>Get cookies.txt LOCALLY</strong> (from the link in its own GitHub README).</li>
+<li>Log in to the site normally in Chrome. Then, on that site, click the extension and <strong>Export</strong> the cookies for that site only.</li>
+<li>Save the file where the script looks (<code>2-film-analysis\cookies.txt</code>, or the <code>COOKIES</code> path in <code>reel_bot.py</code>).</li>
+<li>Treat it like a password: it lets anyone act as your account. Never commit it (it is git-ignored), never paste it into a chat. To cut access, log out of the site in Chrome and delete the file.</li>
+</ol>
+<p>Pacing the code already enforces: one download at a time, 30 s between Instagram downloads, a 10-minute pause on HTTP 429, and a full stop with a <code>STOP</code> file on a login challenge, "sign in to confirm" or 403. If a <code>STOP</code> file appears, read it, wait, and delete it by hand before running again. Do not try to get around a block.</p>
+
+<h2>9. Set up the context harness (the assistant's memory)</h2>
+<h3>9.1 Make the vault</h3>
+<p><strong>Step 1.</strong> Open Obsidian → <strong>Create new vault</strong> → name it, place it <strong>outside</strong> <code>C:\dev</code> (e.g. <code>C:\MY VAULT</code>).</p>
+<p><strong>Step 2.</strong> Create this structure and copy the templates from <code>context-harness\templates\</code>:</p>
+<pre><code>MY VAULT\
+  INDEX.md                       a list of projects, one line each
+  Harness\Preferences.md         how you want the assistant to work
+  Harness\Lessons.md             symptom | cause | fix
+  Harness\Eval Checklist.md      what must be true before &quot;done&quot;
+  Harness\Vault Registry.md      every vault and where to resume it
+  Projects\&lt;project&gt;\STATE.md    from templates\STATE.md
+  Projects\&lt;project&gt;\run-log.md  from templates\run-log.md
+  _Harness\Resume Protocol.md    from templates\Resume Protocol.md
+</code></pre>
+<p><strong>Step 3.</strong> Start every note with front matter naming its parent, e.g. <code>up: "[[INDEX]]"</code>, and link related notes with <code>[[Note name]]</code>. Open <strong>Graph view</strong>: that graph is the ontology.</p>
+<p><strong>Step 4.</strong> Optional: <strong>Settings → Graph → Groups</strong>, one colour per project (query <code>path:"Projects/&lt;name&gt;"</code>).</p>
+<h3>9.2 Tell Claude Code to use it</h3>
+<p>Create <code>%USERPROFILE%\.claude\CLAUDE.md</code> (Claude Code loads it in every session) with the rules from <code>context-harness\CLAUDE.example.md</code>. Put in your vault's real paths. The key rules: never rebuild context from the chat, read Preferences → Registry → Resume Protocol → STATE → the end of run-log, write back to run-log/STATE after each step, add a Lessons row for every mistake, and run the Eval Checklist before saying done.</p>
+<p>Test it: open a new Claude Code session and ask "what is the state of <code>my-project</code>?". It should read the notes and cite them.</p>
+<h3>9.3 Share it across PCs and accounts</h3>
+<pre><code class="language-powershell">cd &quot;C:\MY VAULT&quot;
+git init -b main
+Add-Content .gitignore &quot;.obsidian/workspace*.json`n.trash/&quot;
+git add -A; git commit -m &quot;First vault commit&quot;
+gh repo create my-vault --private --source . --push        # or create a private repo on github.com and git push
+</code></pre>
+<p>On every other PC: install Obsidian, Git and Claude Code, <code>git clone</code> the private repo, open it as a vault, and copy the same <code>CLAUDE.md</code>. Any Claude account signed in on any of those PCs now starts from the same notes.</p>
+<p>Daily sync (pull, then commit and push only changed notes after a secret scan; stops on a conflict or a secret):</p>
+<pre><code class="language-bash"># Git Bash
+bash /c/dev/ai-systems-portfolio/context-harness/scripts/sync-vaults.sh MyLaptop &quot;C:/MY VAULT&quot;
+</code></pre>
+<p>Keep the global rules file in a private repo too, so every machine loads the same rules.</p>
+<h3>9.4 Optional: a generated ontology vault</h3>
+<p><code>context-harness\ontology-generator\ontology.py</code> is a map of domains → concepts (keyword pattern + one-line definition). <code>build_vault.py</code> matches collected audience questions (JSON lines in <code>data\youtube</code>, <code>data\reddit</code>, <code>data\x</code>, <code>data\exa</code>) to those concepts and writes one linked note per concept plus an <code>Ontology.canvas</code>. It is included to show the method. Its collectors are not part of this repository, so feed it your own question files in the same shape or adapt <code>load()</code>.</p>
+
+<h2>10. Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CERTIFICATE_VERIFY_FAILED</code> on downloads</td>
+<td>Antivirus re-signs HTTPS (Norton, Kaspersky…)</td>
+<td>Already handled with <code>truststore</code> in <code>dl.py</code> / <code>ytdl.py</code>. For other scripts add <code>import truststore; truststore.inject_into_ssl()</code> at the top. Never switch certificate checks off</td>
+</tr>
+<tr>
+<td><code>Library cublas64_12.dll is not found</code></td>
+<td>Windows does not see pip's GPU libraries</td>
+<td><code>pip install nvidia-cublas-cu12 nvidia-cudnn-cu12</code>; the scripts add those folders at start-up (top of <code>transcribe.py</code>)</td>
+</tr>
+<tr>
+<td><code>open() got an unexpected keyword argument 'metadata_errors'</code></td>
+<td>PyAV 19 vs faster-whisper's own decoder</td>
+<td>Pass audio as a numpy array (as <code>transcribe.py</code> and <code>prepare_vod.py</code> do), or <code>pip install "av&lt;19"</code></td>
+</tr>
+<tr>
+<td>YouTube: "Sign in to confirm you're not a bot"</td>
+<td>Too many requests, or a datacentre IP</td>
+<td>Stop, wait some hours, run from a home connection; add your cookies (section 8). Do not loop retries</td>
+</tr>
+<tr>
+<td>YouTube: no formats / "n challenge" errors</td>
+<td>yt-dlp outdated or Node.js missing</td>
+<td><code>.\.venv\Scripts\python -m pip install -U "yt-dlp[default]"</code>; check <code>node -v</code></td>
+</tr>
+<tr>
+<td>Instagram: "login required" / checkpoint</td>
+<td>Session expired or a security check</td>
+<td>Open Instagram in Chrome, resolve the check, export cookies again, restart the bot</td>
+</tr>
+<tr>
+<td><code>yt-dlp.exe</code> blocked by Windows</td>
+<td>Application Control / Smart App Control</td>
+<td>Use <code>python -m yt_dlp</code> (the scripts already do)</td>
+</tr>
+<tr>
+<td>Demucs or Whisper: CUDA out of memory</td>
+<td>Another model holds the GPU</td>
+<td><code>ollama stop &lt;model&gt;</code>; close games and browsers; run the GPU stage alone</td>
+</tr>
+<tr>
+<td>A job killed / "system low on memory"</td>
+<td>16 GB RAM shared with Chrome</td>
+<td>One heavy job at a time; close Chrome; the clipper waits for free RAM by itself (<code>config\budget.json</code>)</td>
+</tr>
+<tr>
+<td>Nothing downloads with <code>--print</code></td>
+<td><code>--print</code> implies "simulate"</td>
+<td>Add <code>--no-simulate</code> (the bot already does)</td>
+</tr>
+<tr>
+<td><code>run_film.ps1</code> cannot be loaded</td>
+<td>PowerShell execution policy</td>
+<td><code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code></td>
+</tr>
+<tr>
+<td>Qwen tags look wrong for a whole category</td>
+<td>The prompt's labels do not fit your videos</td>
+<td>Check 5+ frames per label by hand first; add a one-line definition per label in <code>tag.py</code>'s prompt</td>
+</tr>
+<tr>
+<td><code>ModuleNotFoundError: feedparser</code></td>
+<td>Main requirements not installed</td>
+<td><code>.\.venv\Scripts\python -m pip install -r requirements.txt</code></td>
+</tr>
+</tbody>
+</table>
+
+<h2>11. Updating and removing</h2>
+<ul>
+<li>Update tools: <code>.\.venv\Scripts\python -m pip install -U "yt-dlp[default]"</code> (do this first whenever downloads break); <code>winget upgrade --all</code>; <code>ollama pull &lt;model&gt;</code> again for a newer build.</li>
+<li>Free disk: delete <code>work\&lt;id&gt;\proxy.mp4</code>, <code>audio*.wav</code> and <code>stems\</code> after a film card is written; delete videos in <code>video\</code>.</li>
+<li>Remove models: <code>ollama rm qwen3-vl:8b</code>; delete <code>%USERPROFILE%\.cache\huggingface\hub\models--Systran--faster-whisper-*</code>.</li>
+<li>Remove everything: delete <code>C:\dev\ai-systems-portfolio</code> and uninstall the winget packages.</li>
+</ul>
+
+<h2>12. Rules worth keeping</h2>
+<ul>
+<li>Local models do the bulk; Claude reads only the compact outputs. State the cost before a big run.</li>
+<li>Check the real output (open the clip, look at the sheet) before calling anything done.</li>
+<li>Test any model used as a judge on a clearly good and a clearly bad example before trusting it.</li>
+<li>Secrets (bot token, cookies) live in files that are git-ignored, are never printed, and are never pasted into a chat.</li>
+<li>Respect the platforms: slow, one at a time, stop on a block, keep only what you need.</li>
+</ul></body></html>

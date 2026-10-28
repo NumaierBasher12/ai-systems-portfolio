@@ -1,13 +1,13 @@
 # AI Systems Portfolio: context harness and video understanding pipeline
 
-Two working systems, built and used every day by a two-person student team on ordinary home PCs (16 GB RAM, 6 GB GPU). This repository holds the real source code and the documentation. Large model weights, videos, cookies and tokens are kept out on purpose.
+Two working systems, built and used every day by a two-person student team on ordinary home PCs (16 GB RAM, 6–8 GB NVIDIA GPU). This repository holds the real source code and the documentation. Large model weights, videos, cookies and tokens are kept out on purpose.
 
 | | System | One-line summary |
 |---|---|---|
 | 1 | [Context harness](context-harness/) | An Obsidian ontology graph that gives an AI assistant long-term, shared memory across PCs and accounts, and learns from its own mistakes |
 | 2 | [Video understanding pipeline](video-pipeline/) | yt-dlp + FFmpeg + Whisper + local vision models + Claude: turns long YouTube videos, Instagram Reels and Telegram-sent videos into study notes and short clips |
 
-Full explanations with diagrams: [`docs/AI-Systems-Overview.pdf`](docs/AI-Systems-Overview.pdf).
+Full explanations with diagrams: [`docs/AI-Systems-Overview.pdf`](docs/AI-Systems-Overview.pdf). **Install it on your own PC:** [`SETUP.md`](SETUP.md) (also as [`docs/Setup-Guide.pdf`](docs/Setup-Guide.pdf)).
 
 ## 1. Context harness
 

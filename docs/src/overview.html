@@ -13,7 +13,7 @@
     <div class="kpi"><b>≈37%</b><span>overall token use vs the earlier chat-based workflow <span class="tag e">team estimate</span></span></div>
     <div class="kpi"><b>300–400 s</b><span>to grasp a 15-minute video from the outputs <span class="tag e">team estimate</span></span></div>
   </div>
-  <p class="small">Source code and templates: the accompanying GitHub repository (README.md). Hardware: 16 GB RAM, 6 GB NVIDIA GPU, Windows 11. Only Claude is a paid subscription; every other model and tool is free and runs locally.</p>
+  <p class="small">Source code and templates: the accompanying GitHub repository (README.md). Hardware: 16 GB RAM, 6–8 GB NVIDIA GPU, Windows 11. Only Claude is a paid subscription; every other model and tool is free and runs locally.</p>
 </section>
 
 <h2>1. Summary</h2>
@@ -208,7 +208,7 @@
 <h2>4. Engineering choices</h2>
 <table>
   <tr><th style="width:30%">Choice</th><th>Why</th></tr>
-  <tr><td>Two GPU stages (<code>cpu</code>, then <code>gpu</code>)</td><td>A 6 GB GPU fits one heavy model at a time: Whisper, then Demucs, then the vision model.</td></tr>
+  <tr><td>Two GPU stages (<code>cpu</code>, then <code>gpu</code>)</td><td>A 6–8 GB GPU fits one heavy model at a time: Whisper, then Demucs, then the vision model.</td></tr>
   <tr><td>Resume-safe scripts</td><td>Every bulk job appends results and skips finished items, so a crash or reboot loses nothing.</td></tr>
   <tr><td>Resource gates</td><td>Heavy steps wait for free RAM, VRAM and disk; a daily cap limits Claude calls.</td></tr>
   <tr><td>Local first, Claude last</td><td>Free local models do the volume; the paid model does judgement and writing.</td></tr>

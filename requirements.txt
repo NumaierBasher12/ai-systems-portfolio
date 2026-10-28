@@ -1,0 +1,15 @@
+# Main environment (Python 3.13): download, Whisper, shots, vision tags, clipper, bot.
+# Versions are the ones the pipeline ran with on 2026-10-29.
+yt-dlp[default]==2026.10.21   # includes yt-dlp-ejs (YouTube JavaScript challenge, needs Node.js)
+truststore==0.10.5            # use the Windows certificate store (antivirus HTTPS scanning)
+faster-whisper==1.2.1
+nvidia-cublas-cu12==12.9.2.10 # GPU libraries for faster-whisper on Windows, no CUDA toolkit needed
+nvidia-cudnn-cu12==9.27.0.42
+scenedetect==0.7.2
+opencv-python==5.0.0.93
+numpy==2.5.4
+pillow==13.0.0
+psutil==7.2.2
+feedparser                    # clipper channel watch (RSS)
+playwright                    # only for 1-intake/collect_links.py (then: python -m playwright install chromium)
+pymupdf==2.0                  # only to check the PDFs in docs/

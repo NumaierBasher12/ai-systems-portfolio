@@ -1,0 +1,9 @@
+# Audio environment (second venv): Demucs voice/music split + SpeechBrain speaker clusters.
+# Kept apart because these pin their own torch build. Install torch first from the CUDA index:
+#   pip install torch==2.8.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cu128
+demucs==4.1.0
+speechbrain==1.1.0
+soundfile==0.14.0
+scipy==1.17.1
+numpy==2.2.6
+huggingface_hub               # downloads the ECAPA speaker model once
