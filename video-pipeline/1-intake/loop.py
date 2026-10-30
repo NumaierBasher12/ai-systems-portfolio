@@ -13,7 +13,7 @@ import psutil
 HERE = Path(__file__).parent
 ROOT = Path(r"C:\dev\reels")
 INBOX, ANALYSED, LEDGER, QUEUE = ROOT / "1-inbox", ROOT / "3-analysed", ROOT / "ledger.csv", ROOT / "queue" / "links.txt"
-ANALYZE = Path(r"C:\Users\yusha\OneDrive\Desktop\Web Scraping\analyze_reel.py")
+ANALYZE = Path(os.environ.get("ANALYZE_REEL", "analyze_reel.py"))  # path to the analyser script, see SETUP.md
 COLLECT = ROOT / "collector" / "collect_links.py"
 LOG, STATUS, LOCK = HERE / "loop.log", HERE / "status.json", HERE / "loop.lock"
 FIELDS = ["id", "link", "collection", "status", "added", "note"]

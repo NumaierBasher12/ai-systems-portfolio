@@ -1,6 +1,6 @@
 # Contributors
 
-A two-person student team. Who built what:
+Both systems (the context harness and the video pipeline) were co-built by a two-person student team, designed and developed together. Who led which component:
 
 | Component | Where | Author |
 |---|---|---|
