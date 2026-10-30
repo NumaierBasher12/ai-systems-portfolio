@@ -1,14 +1,14 @@
 """Builds the Fable knowledge vault (an ontology of style knowledge + real audience questions) from the raw scrape.
-Reads data/youtube, data/reddit, data/x, data/exa. Writes C:\\FABLE VAULT (generated folders only) and
+Reads data/youtube, data/reddit, data/x, data/exa. Writes the output vault folder (generated folders only) and
 data/tables/idea_bank.csv. Re-run any time: generated folders are rebuilt, 'My Notes' and '_Project' are never touched.
 Usage: python build_vault.py"""
-import csv, json, re, shutil, statistics
+import csv, json, os, re, shutil, statistics
 from collections import Counter, defaultdict
 from pathlib import Path
 from config import DATA
 from ontology import ONTOLOGY, FORMATS
 
-VAULT = Path(r"C:\FABLE VAULT")
+VAULT = Path(os.environ.get("FABLE_VAULT", Path.home() / "ontology-vault"))
 GENERATED = ["Concepts", "Domains", "Question Bank", "Formats", "Home.md", "Hook Library.md", "Creators.md", "Ontology.canvas"]
 NOISE = re.compile(r"official (music )?video|\bsong|lyric|full movie|trailer|\baudio\b|\bft\.|feat\.|jukebox|remix|\bdance\b|#bollywood|punjabi songs?", re.I)
 QSTART = re.compile(r"^(how|what|why|which|should|is|are|does|do|can|any|where|when|anyone|help|would|will)\b", re.I)
@@ -214,7 +214,7 @@ def main():
     gaps = sorted((n for n in allc if len(C[n]["questions"]) >= 10), key=lambda n: -len(C[n]["questions"]) / (len(C[n]["videos"]) + 1))[:15]
     home = ["# Fable Knowledge Vault\n",
             "An ontology of style knowledge built from the scrape: **domains → concepts → real audience questions → idea seeds**. "
-            f"Open the graph view (colour = domain) or {link('Ontology.canvas')}. Raw ideas for a spreadsheet: `C:\\dev\\fable-research\\data\\tables\\idea_bank.csv` ({n_ideas:,} rows).\n",
+            f"Open the graph view (colour = domain) or {link('Ontology.canvas')}. Raw ideas for a spreadsheet: `data/tables/idea_bank.csv` ({n_ideas:,} rows).\n",
             "## How ideas multiply\nEvery concept × every format (9) × every real question. Pick a concept, pick a format, answer one question = one post. "
             f"{len(allc)} concepts × {len(FORMATS)} formats = {len(allc) * len(FORMATS)} angles before using a single question.\n",
             "## Domains\n| Domain | Mentions | Questions | Likes | Videos |\n|---|---|---|---|---|"]
@@ -224,7 +224,7 @@ def main():
     home.append("\n## Gaps: many questions, few videos (content opportunities)\n| Concept | Questions | Videos |\n|---|---|---|")
     home += [f"| {link(n)} | {len(C[n]['questions'])} | {len(C[n]['videos'])} |" for n in gaps]
     home.append(f"\n## Also\n- {link('Hook Library')}: openings of top videos\n- {link('Creators')}: who to study\n- Question Bank: one note per domain\n- Formats: {' · '.join(link('Formats/' + f) for f, _ in FORMATS)}\n")
-    home.append(f"\n_Data: {len(items):,} comments/posts, {len(rel):,} on-topic videos (of {len(videos):,}), {len(sources)} research sources. Rebuild: `python C:\\dev\\fable-research\\scripts\\build_vault.py`._\n")
+    home.append(f"\n_Data: {len(items):,} comments/posts, {len(rel):,} on-topic videos (of {len(videos):,}), {len(sources)} research sources. Rebuild: `python build_vault.py`._\n")
     write(VAULT / "Home.md", "\n".join(home))
     write(VAULT / "Ontology.canvas", canvas(C))
 

@@ -1,14 +1,16 @@
 r"""Collect reel links from ONE Instagram Saved collection, add new ones to the ledger, write them to queue\links.txt.
 
 Run by hand:  python collect_links.py "AI cooking"
-Reads only. Uses the session cookies in C:\dev\reels\cookies.txt (SECRET, never printed).
+Reads only. Uses the session cookies in cookies.txt in the reels folder (SECRET, never printed).
 Stops at once if Instagram shows a login or challenge page. No proxies, no tricks: one slow browser, human-ish pauses.
 """
 import csv, re, sys, time, random
+import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+REELS = Path(os.environ.get("REELS_ROOT", Path.home() / "reels"))
 
-ROOT = Path(r"C:\dev\reels")
+ROOT = REELS
 COOKIES = ROOT / "cookies.txt"
 LEDGER = ROOT / "ledger.csv"
 QUEUE = ROOT / "queue" / "links.txt"

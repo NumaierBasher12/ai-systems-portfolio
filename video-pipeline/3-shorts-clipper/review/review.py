@@ -27,7 +27,7 @@ def run_review(conn, cfg, job):
                          "JOIN videos v ON v.id=c.video_id ORDER BY c.score DESC").fetchall()
     parts = [f"# Review {datetime.now():%Y-%m-%d}", "",
              "Tick ONE box per clip (`[x]`), add a note if you like, save the file. The next run reads your marks: approved clips go to the outbox folder "
-             "(`C:/dev/assistant/outbox/<date>/`) with their copy, rejected ones are remembered. Nothing is posted by the assistant. Copy marked with Flags "
+             "(`outbox/<date>/`) with their copy, rejected ones are remembered. Nothing is posted by the assistant. Copy marked with Flags "
              "failed the Voice Check and was NOT used in the clip.", ""]
     for n, x in enumerate(cands, 1):
         clip = conn.execute("SELECT path, status FROM clips WHERE candidate_id=? ORDER BY id DESC LIMIT 1", (x["id"],)).fetchone()

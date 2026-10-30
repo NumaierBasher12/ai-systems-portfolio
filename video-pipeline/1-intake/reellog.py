@@ -5,10 +5,12 @@ Inputs: ledger.csv, 3-analysed\ig_<id>\{timeline.json,explain.md}, decisions.txt
 Output: Projects\Web Scraping\Reel Log.md (table, newest first, plus a dated event history).
 """
 import csv, json, re
+import os
 from pathlib import Path
+REELS = Path(os.environ.get("REELS_ROOT", Path.home() / "reels"))
 
-ROOT = Path(r"C:\dev\reels")
-OUT = Path(r"C:\OBSIDIAN VAULT\Codebase and learning\Projects\Web Scraping\Reel Log.md")
+ROOT = REELS
+OUT = Path(os.environ.get("REEL_LOG", ROOT / "Reel Log.md"))
 
 
 def lines(p):

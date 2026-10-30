@@ -19,13 +19,16 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta
+import os
+import shutil
 from pathlib import Path
+REELS = Path(os.environ.get("REELS_ROOT", Path.home() / "reels"))
 
 HERE = Path(__file__).parent
-OUT = Path(r"C:\dev\reels\1-inbox")                      # the folder the reel analysis already reads from
-COOKIES = Path(r"C:\dev\reels\cookies.txt")              # your Instagram session (private, never print it)
+OUT = (REELS / "1-inbox")                      # the folder the reel analysis already reads from
+COOKIES = (REELS / "cookies.txt")              # your Instagram session (private, never print it)
 YTDLP = Path.home() / ".ai-video-editor" / "venv" / "Scripts" / "python.exe"   # run as `python -m yt_dlp`: the yt-dlp.exe launcher is blocked by Windows Application Control
-FFMPEG = r"C:\dev\documentary\ffmpeg\bin"
+FFMPEG = os.path.dirname(shutil.which("ffmpeg") or "")  # folder holding ffmpeg, from PATH
 TOKEN_FILE, OWNER_FILE, PAIR_FILE, LOG_FILE = HERE / ".telegram-token", HERE / "owner.json", HERE / "pair-code.txt", HERE / "bot.log"
 IG_GAP = 30          # seconds between Instagram downloads
 IG_BACKOFF = 600     # seconds to pause Instagram after a 429
@@ -96,7 +99,7 @@ def tg(method: str, **params):
         return json.load(r)["result"]
 
 
-IDS_FILE = Path(r"C:\dev\reels\bot\chat_ids.json")  # message ids of this chat (yours + mine), so a new batch can clear the old ones
+IDS_FILE = (REELS / "bot" / "chat_ids.json")  # message ids of this chat (yours + mine), so a new batch can clear the old ones
 
 
 def track(mid: int) -> None:
@@ -213,11 +216,11 @@ def handle(msg: dict) -> None:
         return
     track(msg["message_id"])
     if text.startswith("/help") or text.startswith("/start"):
-        say(chat, "Send an Instagram reel, YouTube or TikTok link, or a video file under 20 MB, and I save it in C:\\dev\\reels\\1-inbox on your PC.\n"
+        say(chat, "Send an Instagram reel, YouTube or TikTok link, or a video file under 20 MB, and I save it in the inbox folder on your PC.\n"
                   "/status shows what I can do right now. Instagram downloads are spaced 30 s apart on purpose.")
         return
     if text.startswith("/reel") or text.startswith("/list"):  # the loop's analysis results (loop\report.py)
-        sys.path.insert(0, r"C:\dev\reels\loop")
+        sys.path.insert(0, str(REELS / "loop"))
         import report
         arg = text.split(maxsplit=1)[1].strip() if len(text.split()) > 1 else ""
         if text.startswith("/list"):
@@ -234,7 +237,7 @@ def handle(msg: dict) -> None:
     if re.match(r"/(go|skip|keep)\b", text):  # your yes/no per reel; Claude Code reads decisions.txt next session
         verb, args = text.split()[0][1:].replace("keep", "go"), text.split()[1:]
         try:
-            nums = json.loads(Path(r"C:\dev\reels\loop\digest.json").read_text())  # {"1": reel id, ...} from the latest digest message
+            nums = json.loads((REELS / "loop" / "digest.json").read_text())  # {"1": reel id, ...} from the latest digest message
         except Exception:
             nums = {}
         if args == ["all"]:
@@ -242,7 +245,7 @@ def handle(msg: dict) -> None:
         ids = [nums.get(a.strip(",")) or (a.strip(",") if re.fullmatch(r"[A-Za-z0-9_-]{8,20}", a.strip(",")) else None) for a in args]
         ids = [i for i in ids if i]
         if ids:
-            with open(r"C:\dev\reels\decisions.txt", "a", encoding="utf-8") as f:
+            with open((REELS / "decisions.txt"), "a", encoding="utf-8") as f:
                 f.writelines(f"{datetime.now():%Y-%m-%d %H:%M} {verb} {i}\n" for i in ids)
             say(chat, f"{verb}: {len(ids)} reel(s) noted." + (" Tell Claude Code \"do the go list\" and it audits and installs them." if verb == "go" else ""))
         else:

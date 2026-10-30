@@ -3,7 +3,7 @@
 #   .\run_film.ps1 -Id <youtube_id> -Stage gpu   # whisper, demucs, audio report, voices, local-model tags (Ollama must be free)
 param([Parameter(Mandatory)][string]$Id, [ValidateSet('cpu','gpu')][string]$Stage = 'cpu')
 $ErrorActionPreference = 'Continue'  # 'Stop' + 2>&1 turns native stderr chatter into fatal errors in PS 5.1
-$root = 'C:\dev\documentary'
+if ($env:DOCUMENTARY_ROOT) { $root = $env:DOCUMENTARY_ROOT } else { $root = "$HOME\documentary" }
 $work = "$root\work\$Id"
 $ff   = (Resolve-Path "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Gyan.FFmpeg_*\ffmpeg-*\bin").Path
 $vs   = "$env:APPDATA\VoiceStudio\runtime\project\.venv\Scripts\python.exe"   # has demucs + speechbrain

@@ -18,11 +18,13 @@ from pathlib import Path
 import cv2
 import numpy as np
 import psutil
+REELS = Path(os.environ.get("REELS_ROOT", Path.home() / "reels"))
+CLIPPING = Path(os.environ.get("CLIPPING_ROOT", Path.home() / "clipping"))
 
-ROOT = Path(r"C:\dev\clipping")
+ROOT = CLIPPING
 STUDY = ROOT / "study"
 DATA = STUDY / "data"
-REELS_OUT = Path(r"C:\dev\reels\3-analysed")  # analyze_reel.py writes here; we move the result
+REELS_OUT = (REELS / "3-analysed")  # analyze_reel.py writes here; we move the result
 ANALYZE = os.environ.get("ANALYZE_REEL", "analyze_reel.py")  # path to the analyser script, see SETUP.md
 FFMPEG = shutil.which("ffmpeg") or "ffmpeg"
 MIN_FREE_RAM_GB = 2.5

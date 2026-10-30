@@ -1,5 +1,5 @@
 """yt-dlp behind Norton: trust the OS certificate store (Norton re-signs HTTPS), then run yt-dlp with the given args.
-Copy of C:\\dev\\clipping\\yt.py so this app has no dependency on the clipping folder."""
+Copy of the clipping folder's yt.py so this app has no dependency on the clipping folder."""
 import sys
 
 import truststore

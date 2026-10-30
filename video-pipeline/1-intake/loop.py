@@ -11,7 +11,7 @@ from pathlib import Path
 import psutil
 
 HERE = Path(__file__).parent
-ROOT = Path(r"C:\dev\reels")
+ROOT = REELS
 INBOX, ANALYSED, LEDGER, QUEUE = ROOT / "1-inbox", ROOT / "3-analysed", ROOT / "ledger.csv", ROOT / "queue" / "links.txt"
 ANALYZE = Path(os.environ.get("ANALYZE_REEL", "analyze_reel.py"))  # path to the analyser script, see SETUP.md
 COLLECT = ROOT / "collector" / "collect_links.py"
@@ -23,6 +23,7 @@ import reel_bot as rb  # same download() the Telegram bot uses (cookies, 429 bac
 sys.path.insert(0, str(HERE))
 import report  # Telegram text for one analysed reel
 import screentext  # on-screen text, 4 fps
+REELS = Path(os.environ.get("REELS_ROOT", Path.home() / "reels"))
 
 
 def notify(text):
@@ -221,7 +222,7 @@ def tick():
 
 
 DIGESTED = HERE / "digested.json"
-VAULT_DIGESTS = Path(r"C:\OBSIDIAN VAULT\Codebase and learning\Projects\Web Scraping\Reel digests")
+VAULT_DIGESTS = Path(os.environ.get("VAULT_DIGESTS", ROOT / "digests"))
 
 
 def digest(counts, led):

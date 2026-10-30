@@ -3,9 +3,11 @@ r"""Build the Telegram text for one analysed reel (no AI, plain extraction from 
 Used by loop.py (after each analysis) and reel_bot.py (/reel <id>, /list).
 """
 import json, re, sys
+import os
 from pathlib import Path
+REELS = Path(os.environ.get("REELS_ROOT", Path.home() / "reels"))
 
-ANALYSED = Path(r"C:\dev\reels\3-analysed")
+ANALYSED = (REELS / "3-analysed")
 URL = re.compile(r"https?://[^\s)>\]]+|(?:github\.com|www\.[a-z0-9.-]+\.[a-z]{2,})/[^\s)>\]]+", re.I)
 CTA = re.compile(r"""comment\s+["'“]?([A-Za-z0-9_ -]{2,20}?)["'”]?\s+(?:for|and|to|below)""", re.I)
 

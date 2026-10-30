@@ -6,11 +6,13 @@ Writes: table measures, views training / format_scoreboard, db/training.csv (one
         label + measurements), vault note Formats/Format Library (auto).md
 """
 import csv, glob, json, os, sqlite3, statistics as st
+CLIP = os.environ.get('CLIPPING_ROOT', os.path.join(os.path.expanduser('~'), 'clipping')).replace(chr(92), '/')
+VAULT = os.environ.get('CLIPPING_VAULT', os.path.join(os.path.expanduser('~'), 'vault')).replace(chr(92), '/')
 
-DB = 'C:/dev/clipping/db/clips.db'
-DATA = 'C:/dev/clipping/study/data'
-OUT_CSV = 'C:/dev/clipping/db/training.csv'
-NOTE = 'C:/CLIPPING VAULT/Formats/Format Library (auto).md'
+DB = CLIP + '/db/clips.db'
+DATA = CLIP + '/study/data'
+OUT_CSV = CLIP + '/db/training.csv'
+NOTE = VAULT + '/Formats/Format Library (auto).md'
 
 c = sqlite3.connect(DB)
 c.executescript('''
@@ -79,8 +81,8 @@ for r in R:
 
 lines = ['---', 'tags: [formats, auto]', 'up: "[[Format Catalog]]"', '---',
          '# Format Library (auto-generated, do not edit by hand)', '',
-         'Source: `C:\\dev\\clipping\\db\\clips.db` tables `reads` (by-eye labels) and `measures` (from features.json). '
-         'Rebuild: `python -X utf8 C:\\dev\\clipping\\db\\build_training.py`. Labels are SEEN by Claude; numbers are MEASURED. '
+         'Source: `db/clips.db` in the clipping folder tables `reads` (by-eye labels) and `measures` (from features.json). '
+         'Rebuild: `python -X utf8 build_training.py`. Labels are SEEN by Claude; numbers are MEASURED. '
          'Views are lifetime views, not normalised for channel size or age (see Caveats).', '',
          f'Clips read so far: {len(R)}. Streamers covered: {len({r["streamer"] for r in R})}.', '',
          '## Formats (by-eye label, with measured medians)', '']

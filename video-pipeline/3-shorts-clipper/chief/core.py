@@ -10,6 +10,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 import psutil
+REELS = Path(os.environ.get("REELS_ROOT", Path.home() / "reels"))
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA, LOGS, CONFIG = ROOT / "data", ROOT / "logs", ROOT / "config"
@@ -190,7 +191,7 @@ def notify(text, cfg):
     if not cfg.get("notify_telegram"):
         return
     try:
-        sys.path.insert(0, r"C:\dev\reels\bot")
+        sys.path.insert(0, str(REELS / "bot"))
         import reel_bot as rb  # ponytail: borrows the existing bot; copy its two small functions when the bot moves
         if not rb.TOKEN:
             rb.TOKEN = rb.TOKEN_FILE.read_text().strip()

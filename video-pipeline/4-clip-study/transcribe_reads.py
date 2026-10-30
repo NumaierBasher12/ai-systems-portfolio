@@ -3,13 +3,14 @@
 For each clip id without a row in `transcript_status`: download the audio only (yt-dlp, same flags as
 study/audio_backfill.py), transcribe with faster-whisper large-v3-turbo on the GPU, store one row per
 segment in `transcripts` (clip_id, start, end, text), delete the audio. Stops on a YouTube block
-(429 / bot check); never retries around it. Log: C:/dev/clipping/db/transcribe.log
+(429 / bot check); never retries around it. Log: db/transcribe.log in the clipping folder
 Run:  python -X utf8 transcribe_reads.py [max_clips]
 """
 import sqlite3
 import subprocess
 import sys
 import time
+import os
 from pathlib import Path
 
 import av
@@ -18,8 +19,9 @@ _open = av.open  # PyAV 19 dropped the metadata_errors kwarg that faster-whisper
 av.open = lambda *a, **k: _open(*a, **{x: y for x, y in k.items() if x != "metadata_errors"})
 
 from faster_whisper import WhisperModel  # noqa: E402
+CLIPPING = Path(os.environ.get("CLIPPING_ROOT", Path.home() / "clipping"))
 
-ROOT = Path(r"C:\dev\clipping")
+ROOT = CLIPPING
 DB = ROOT / "db" / "clips.db"
 TMP = ROOT / "db" / "audio_tmp"
 LOG = ROOT / "db" / "transcribe.log"

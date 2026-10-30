@@ -7,12 +7,14 @@ import json
 import re
 import sqlite3
 import urllib.request
+import os
 from pathlib import Path
 
 from chief import core
 from moments.finder import JUDGE_MODEL, OLLAMA_URL
+CLIPPING = Path(os.environ.get("CLIPPING_ROOT", Path.home() / "clipping"))
 
-CLIPS_DB = Path(r"C:\dev\clipping\db\clips.db")  # read-only knowledge base from the study
+CLIPS_DB = (CLIPPING / "db" / "clips.db")  # read-only knowledge base from the study
 
 
 def hook_context(streamer):

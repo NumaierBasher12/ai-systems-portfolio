@@ -35,7 +35,7 @@ Models you will download (once):
 ```powershell
 winget install --id Git.Git -e --source winget
 cd <a folder for your code>
-git clone https://github.com/yushaaanan-design/ai-systems-portfolio.git ai-systems-portfolio
+git clone https://github.com/NumaierBasher12/ai-systems-portfolio.git ai-systems-portfolio
 cd ai-systems-portfolio
 ```
 
@@ -183,6 +183,8 @@ ollama run qwen3:4b "Reply with the single word: ready"
 ## 6. Point the scripts at your PC
 
 The scripts are shown exactly as they ran, so a few constants still name the authors' folders. Change these once (open the file in any editor, search for the line).
+
+The Python folders are now environment variables with portable defaults under your home folder, so you can usually skip editing: `REELS_ROOT`, `CLIPPING_ROOT`, `CLIPPING_VAULT`, `FABLE_VAULT`, `VAULT_DIGESTS`, `REEL_LOG`, `ANALYZE_REEL` (path to `analyze_reel.py`) and, for `run_film.ps1`, `DOCUMENTARY_ROOT`. FFmpeg is found on your `PATH`.
 
 | File | Constant / line | Authors' value | Change to |
 |---|---|---|---|

@@ -7,9 +7,11 @@ Reads:  table measures (clip features), by_streamer/*.csv (streamer, side)
 Writes: vault note Formats/Hook Measurements (auto).md
 """
 import csv, glob, os, sqlite3
+CLIP = os.environ.get('CLIPPING_ROOT', os.path.join(os.path.expanduser('~'), 'clipping')).replace(chr(92), '/')
+VAULT = os.environ.get('CLIPPING_VAULT', os.path.join(os.path.expanduser('~'), 'vault')).replace(chr(92), '/')
 
-DB = 'C:/dev/clipping/db/clips.db'
-NOTE = 'C:/CLIPPING VAULT/Formats/Hook Measurements (auto).md'
+DB = CLIP + '/db/clips.db'
+NOTE = VAULT + '/Formats/Hook Measurements (auto).md'
 MIN_GROUP = 8  # groups smaller than this have meaningless percentiles
 FEATURES = ['cuts_first3', 'first_word_s', 'first_words_n', 'hook_question', 'hook_digit', 'words_per_sec',
             'voiced_share', 'face_area_pct', 'face_y_mean', 'audio_first3_vs_median', 'audio_silence_share',
@@ -43,7 +45,7 @@ def spearman(x, y):
 
 
 group = {}
-for p in glob.glob('C:/dev/clipping/by_streamer/*.csv'):
+for p in glob.glob(CLIP + '/by_streamer/*.csv'):
     s = os.path.basename(p)[:-4]
     if s.startswith('_'):
         continue
@@ -70,7 +72,7 @@ lines = ['---', 'tags: [formats, auto, measurements]', 'up: "[[Format Library (a
          f'Clips measured: {len(rows)}; in groups of at least {MIN_GROUP} (same streamer, same side): {len(pool)} in {len(usable)} groups. '
          'Method: each clip gets a view percentile inside its own (streamer, side) group; Spearman correlation of each feature with that percentile. '
          'FACT = measured. Correlation is not cause; the clips are mostly top-of-channel, so the range of views is narrow. '
-         'Rebuild: `python -X utf8 C:\\dev\\clipping\\db\\measure_hooks.py`.', '',
+         'Rebuild: `python -X utf8 measure_hooks.py`.', '',
          '## All groups pooled', '', '| feature | n | Spearman rho vs within-group view percentile |', '|---|---|---|']
 res = []
 for f in FEATURES:

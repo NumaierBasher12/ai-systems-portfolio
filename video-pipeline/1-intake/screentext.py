@@ -5,11 +5,14 @@ only 0.25 s still gets read. Frames are temporary (deleted afterwards).
 """
 import json, re, shutil, subprocess, sys, tempfile
 from difflib import SequenceMatcher
+import os
+import shutil
 from pathlib import Path
+REELS = Path(os.environ.get("REELS_ROOT", Path.home() / "reels"))
 
 HERE = Path(__file__).parent
-ROOT = Path(r"C:\dev\reels")
-FFMPEG = Path(r"C:\dev\documentary\ffmpeg\bin\ffmpeg.exe")
+ROOT = REELS
+FFMPEG = Path(shutil.which("ffmpeg") or "ffmpeg")
 FPS = 4
 
 

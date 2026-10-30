@@ -96,7 +96,7 @@ def brief():
     cfg, c = core.config(), core.config("sources.json")
     p = Path(c["digest_dir"]) / f"{date.today()}.md"
     if not p.exists():
-        core.notify("Assistant: no digest this morning, the night run did not finish. See C:/dev/assistant/logs/chief.log", cfg)
+        core.notify("Assistant: no digest this morning, the night run did not finish. See logs/chief.log", cfg)
         return
     text = p.read_text(encoding="utf-8")
     m = re.search(r"## Read of the day.*?\n(.*?)\n\n## ", text, re.S)

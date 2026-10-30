@@ -1,6 +1,6 @@
 # AI Systems Portfolio: context harness and video understanding pipeline
 
-Two working systems, built and used every day by a two-person student team on ordinary home PCs (16 GB RAM, 6–8 GB NVIDIA GPU). This repository holds the real source code and the documentation. Large model weights, videos, cookies and tokens are kept out on purpose.
+Two working systems, co-built and used every day by a two-person student team on ordinary home PCs (16 GB RAM, 6–8 GB NVIDIA GPU). This repository holds the real source code and the documentation. Large model weights, videos, cookies and tokens are kept out on purpose.
 
 | | System | One-line summary |
 |---|---|---|
