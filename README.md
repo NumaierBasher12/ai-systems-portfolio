@@ -21,7 +21,7 @@ Full explanations with diagrams: [`docs/AI-Systems-Overview.pdf`](docs/AI-System
 
 **Shared context.** Each vault is a private Git repository, synced with a pull-first, secret-scanned, never-force-push routine. Every PC and every assistant account that clones the repositories starts from the same context.
 
-**Results.** A new session loads 0.4–15% of a mature project's notes (measured on five real vaults). The team estimates overall token use fell to about 37% of the earlier chat-based workflow. The harness supported the team's Model United Nations training work for more than 20 delegates.
+**Results.** A new session loads 0.4–15% of a mature project's notes (measured on five real vaults). The team estimates overall token use fell to about 37% of the earlier chat-based workflow. The harness supported the team's Model United Nations training work for more than 120 individual delegates.
 
 ## 2. Video understanding pipeline
 
@@ -57,4 +57,4 @@ docs/                the PDF overview and its source
 ## Status of the numbers
 
 - **Measured:** token counts for the film example; resume-load shares for the five vaults (bytes ÷ 4; images ≈ width×height/750).
-- **Team estimates:** the 37% overall token figure; 300–400 seconds to grasp a 900 seconds of content; 120+ delegates supported.
+- **Team estimates:** the 37% overall token figure; 300–400 seconds to grasp a 15 minute video; 120+ delegates across Dhaka supported.
