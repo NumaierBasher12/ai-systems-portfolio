@@ -57,4 +57,4 @@ docs/                the PDF overview and its source
 ## Status of the numbers
 
 - **Measured:** token counts for the film example; resume-load shares for the five vaults (bytes ÷ 4; images ≈ width×height/750).
-- **Team estimates:** the 37% overall token figure; 300–400 seconds to grasp a 15 minute video; 120+ delegates across Dhaka supported.
+- **Team estimates:** the 37% overall token figure; 323 seconds (average) to grasp a 15 minute video; 120+ delegates across Dhaka supported.
